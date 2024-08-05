@@ -1,22 +1,9 @@
 body {
-  font-family: "Helvetica", "Arial", sans-serif;
+  font-family: "Arial";
   margin: 0 auto;
-  max-width: 40em;
+  max-width: 35em;
   line-height: 1.5;
   padding: 4em 1em;
   color: #444444;
-}
-h2 {
-  margin-top: 1em;
-  padding-top: 1em;
-}
-h1,
-h2,
-h3,
-strong {
-  color: #333;
-}
-code,
-pre {
-  background: #eee;
+  text-align: center; 
 }
