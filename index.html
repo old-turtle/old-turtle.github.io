@@ -16,7 +16,30 @@
 <span style="border: solid 2px #454545; padding: 5px; border-radius: 10px; color: #454545; ">
         Hello world! Welcome to my website.
     </span>
-<br><br><br><br>
+<br><br><br>
+<style>
+    @keyframes moveBackAndForth {
+      0% {
+        transform: translateX(-400%);
+      }
+      50% {
+        transform: translateX(400%);
+      }
+      100% {
+        transform: translateX(-400%);
+      }
+    }
+    .moving-text {
+      display: inline-block;
+      animation: moveBackAndForth 30s linear infinite;
+      font-size: 4rem;
+    }
+  </style>
+  <title>Moving Text Back and Forth</title>
+</head>
+<body>
+  <div class="moving-text">🦦</div>
+  <br>
 <footer>
 &copy; 2024 Patrick Rymar. All rights reserved.
 </footer>
