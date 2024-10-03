@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        #gameArea {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            grid-template-rows: repeat(10, 40px);
+            gap: 2px;
+        }
+        .cell {
+            width: 40px;
+            height: 40px;
+            background-color: #d3d3d3;
+            text-align: center;
+            line-height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            border: 1px solid #999;
+        }
+        .cell.revealed {
+            background-color: #e0e0e0;
+            cursor: default;
+        }
+        .cell.flag {
+            background-color: #ffcc00;
+        }
+        .cell.mine {
+            background-color: #ff5733;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #ff5733;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Minesweeper Game</h1>
+<div id="gameArea"></div>
+<div id="message"></div>
+<button id="restartButton" style="display: none;">Restart Game</button>
+
+<script>
+    const rows = 10;        // Number of rows
+    const cols = 10;        // Number of columns
+    const totalMines = 10;  // Number of mines
+    let board = [];         // Game board array
+    let revealedCount = 0;  // Count of revealed cells
+    let isGameOver = false; // Game over flag
+
+    // Create the game board
+    function createBoard() {
+        // Initialize the board with empty cells
+        board = Array.from({ length: rows }, () => 
+            Array.from({ length: cols }, () => ({
+                mine: false,
+                revealed: false,
+                adjacent: 0,
+            }))
+        );
+
+        // Place mines randomly
+        let minesPlaced = 0;
+        while (minesPlaced < totalMines) {
+            const r = Math.floor(Math.random() * rows);
+            const c = Math.floor(Math.random() * cols);
+            if (!board[r][c].mine) {
+                board[r][c].mine = true;
+                minesPlaced++;
+                incrementAdjacentCells(r, c);
+            }
+        }
+
+        renderBoard();
+    }
+
+    // Increment the adjacent cell counts around a mine
+    function incrementAdjacentCells(mineRow, mineCol) {
+        for (let r = mineRow - 1; r <= mineRow + 1; r++) {
+            for (let c = mineCol - 1; c <= mineCol + 1; c++) {
+                if (r >= 0 && r < rows && c >= 0 && c < cols && !board[r][c].mine) {
+                    board[r][c].adjacent++;
+                }
+            }
+        }
+    }
+
+    // Render the game board in the HTML
+    function renderBoard() {
+        const gameArea = document.getElementById('gameArea');
+        gameArea.innerHTML = '';
+        board.forEach((row, rIndex) => {
+            row.forEach((cell, cIndex) => {
+                const cellElement = document.createElement('div');
+                cellElement.className = 'cell';
+                cellElement.addEventListener('click', () => handleCellClick(rIndex, cIndex));
+                cellElement.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    handleCellRightClick(rIndex, cIndex);
+                });
+                gameArea.appendChild(cellElement);
+            });
+        });
+    }
+
+    // Handle left-click on a cell
+    function handleCellClick(r, c) {
+        if (isGameOver || board[r][c].revealed) return;
+
+        board[r][c].revealed = true;
+        revealedCount++;
+
+        const cellElement = document.querySelectorAll('.cell')[r * cols + c];
+        cellElement.classList.add('revealed');
+        
+        if (board[r][c].mine) {
+            cellElement.classList.add('mine');
+            gameOver(false);
+        } else {
+            cellElement.textContent = board[r][c].adjacent > 0 ? board[r][c].adjacent : '';
+            if (board[r][c].adjacent === 0) {
+                revealAdjacentCells(r, c);
+            }
+            if (revealedCount === (rows * cols - totalMines)) {
+                gameOver(true);
+            }
+        }
+    }
+
+    // Handle right-click on a cell
+    function handleCellRightClick(r, c) {
+        if (isGameOver || board[r][c].revealed) return;
+        const cellElement = document.querySelectorAll('.cell')[r * cols + c];
+        if (cellElement.classList.contains('flag')) {
+            cellElement.classList.remove('flag');
+        } else {
+            cellElement.classList.add('flag');
+        }
+    }
+
+    // Reveal adjacent cells recursively
+    function revealAdjacentCells(r, c) {
+        for (let row = r - 1; row <= r + 1; row++) {
+            for (let col = c - 1; col <= c + 1; col++) {
+                if (row >= 0 && row < rows && col >= 0 && col < cols && !board[row][col].revealed) {
+                    handleCellClick(row, col);
+                }
+            }
+        }
+    }
+
+    // Handle game over scenarios
+    function gameOver(won) {
+        isGameOver = true;
+        const messageElement = document.getElementById('message');
+        messageElement.textContent = won ? 'Congratulations! You won!' : 'Game Over! You hit a mine.';
+        document.getElementById('restartButton').style.display = 'block';
+    }
+
+    // Restart the game
+    document.getElementById('restartButton').addEventListener('click', () => {
+        isGameOver = false;
+        revealedCount = 0;
+        document.getElementById('message').textContent = '';
+        document.getElementById('restartButton').style.display = 'none';
+        createBoard();
+    });
+
+    // Initialize the game
+    createBoard();
+</script>
+
+</body>
+</html>
