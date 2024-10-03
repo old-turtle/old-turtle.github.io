@@ -17,6 +17,10 @@
         h1 {
             margin-bottom: 20px;
         }
+        #smiley {
+            font-size: 50px;
+            cursor: pointer;
+        }
         #gameArea {
             display: grid;
             grid-template-columns: repeat(10, 40px);
@@ -63,6 +67,7 @@
 <body>
 
 <h1>Minesweeper Game</h1>
+<div id="smiley">😃</div> <!-- Smiley face -->
 <div id="gameArea"></div>
 <div id="message"></div>
 <button id="restartButton" style="display: none;">Restart Game</button>
@@ -134,6 +139,9 @@
     function handleCellClick(r, c) {
         if (isGameOver || board[r][c].revealed) return;
 
+        // Change smiley face to shocked face on first click
+        document.getElementById('smiley').textContent = "😲";
+
         board[r][c].revealed = true;
         revealedCount++;
 
@@ -141,7 +149,7 @@
         cellElement.classList.add('revealed');
         
         if (board[r][c].mine) {
-            cellElement.classList.add('mine');
+            cellElement.innerHTML = "💣"; // Show bomb emoji
             gameOver(false);
         } else {
             cellElement.textContent = board[r][c].adjacent > 0 ? board[r][c].adjacent : '';
@@ -180,6 +188,7 @@
     function gameOver(won) {
         isGameOver = true;
         const messageElement = document.getElementById('message');
+        document.getElementById('smiley').textContent = won ? '😃' : '😵'; // Show dead emoji on loss
         messageElement.textContent = won ? 'Congratulations! You won!' : 'Game Over! You hit a mine.';
         document.getElementById('restartButton').style.display = 'block';
     }
@@ -190,6 +199,7 @@
         revealedCount = 0;
         document.getElementById('message').textContent = '';
         document.getElementById('restartButton').style.display = 'none';
+        document.getElementById('smiley').textContent = '😃'; // Reset smiley face
         createBoard();
     });
 
